@@ -1,4 +1,3 @@
-from pyexpat import model
 from fastapi import FastAPI, File, UploadFile, Depends, HTTPException
 import pandas as pd
 from datetime import datetime
