@@ -24,7 +24,7 @@
 **/banks/**: Returns the number of unique banks present in the table.
 
 
-**/transaction_count/**: Takes two parameters `date_from` and `date_to`.
+**/{from_date}/{to_date}**: Takes two parameters `date_from` and `date_to`.
 
 
   > `date_from` and `date_to` should be entered in `YYYY-mm-dd` format.
