@@ -1,4 +1,3 @@
-from pyexpat import model
 from fastapi import FastAPI, File, UploadFile, Depends, HTTPException
 import pandas as pd
 from datetime import datetime
@@ -86,8 +85,8 @@ def get_unique_banks(db: Session = Depends(get_db)):
             details=f"Couldn't get banks list {exc!s}"
         )
 
-@app.get("/transaction_count/{from_date}/{to_date}")
-def get_transaction_count(from_date:str, to_date:str, db: Session = Depends(get_db)):
+@app.get("/transaction_count/")
+def get_transaction_count(from_date: str, to_date: str, db: Session = Depends(get_db)):
     """
     Returns the count of transaction records between specific dates:
     Params:
