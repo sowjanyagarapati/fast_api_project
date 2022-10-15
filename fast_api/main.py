@@ -85,7 +85,7 @@ def get_unique_banks(db: Session = Depends(get_db)):
             details=f"Couldn't get banks list {exc!s}"
         )
 
-@app.get("/transaction_count/")
+@app.get("/{from_date}/{to_date}")
 def get_transaction_count(from_date: str, to_date: str, db: Session = Depends(get_db)):
     """
     Returns the count of transaction records between specific dates:
