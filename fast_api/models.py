@@ -2,6 +2,9 @@ from sqlalchemy import Column, Integer, String, Date, Float
 from db import Base
 
 class Customers(Base):
+    """
+    Defining Database Schema
+    """
     __tablename__ = "customers"
 
     txn = Column(String)
