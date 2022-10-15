@@ -1,3 +1,4 @@
+from pyexpat import model
 from fastapi import FastAPI, File, UploadFile, Depends, HTTPException
 import pandas as pd
 from datetime import datetime
@@ -10,9 +11,12 @@ from sqlalchemy.sql.expression import func
 
 app = FastAPI()
 
-models.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine) #Creates the Tables
 
 def get_db():
+    """
+    Connecting with db and closing it once query is executed.
+    """
     try:
         db_ = local_session()
         yield db_
@@ -25,6 +29,12 @@ def index():
 
 @app.post("/upload_file/")
 def upload_file(csv_file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """
+    Takes a csv_file and Uploads it into customers table after processing
+    Params:
+    csv_file: CSV File
+    db: Database Session object
+    """
     try:
         df = pd.read_csv(csv_file.file)
         obj = commonUtils()
@@ -50,6 +60,9 @@ def upload_file(csv_file: UploadFile = File(...), db: Session = Depends(get_db))
 
 @app.get("/records/")
 def get_records_count(db: Session = Depends(get_db)):
+    """
+    Returns number of records present in the customers table
+    """
     try:
         records = db.query(models.Customers).with_entities(func.count(models.Customers.rrn)).scalar()
         return {"number of records": records}
@@ -61,6 +74,9 @@ def get_records_count(db: Session = Depends(get_db)):
 
 @app.get("/banks/")
 def get_unique_banks(db: Session = Depends(get_db)):
+    """
+    Returns number of unique banks present in the customers table.
+    """
     try:
         unique_banks = db.query(models.Customers.bank_name).distinct().count()
         return {"Number of Unique Banks": unique_banks}
@@ -71,7 +87,13 @@ def get_unique_banks(db: Session = Depends(get_db)):
         )
 
 @app.get("/transaction_count/{from_date}/{to_date}")
-def get_transaction_count(from_date: str, to_date: str, db: Session = Depends(get_db)):
+def get_transaction_count(from_date:str, to_date:str, db: Session = Depends(get_db)):
+    """
+    Returns the count of transaction records between specific dates:
+    Params:
+    from_date: str (allowed_format : %YYYY-%mm-%dd)
+    to_date: str (allowed_format : %YYYY-%m-%dd)
+    """
     try:
         from_date = (datetime.strptime(from_date, "%Y-%m-%d")).date()
         to_date = (datetime.strptime(to_date, "%Y-%m-%d")).date()
@@ -85,6 +107,9 @@ def get_transaction_count(from_date: str, to_date: str, db: Session = Depends(ge
 
 @app.get("/customer_names/")
 def get_customer_names(db: Session = Depends(get_db)):
+    """
+    Returns the customers names from the table
+    """
     try:
         customers = db.query(models.Customers.acc_holder_name).all()
         return {"Customer names": customers}
@@ -96,6 +121,9 @@ def get_customer_names(db: Session = Depends(get_db)):
 
 @app.get("/transaction_summary/")
 def get_trans_summary(db: Session = Depends(get_db)):
+    """
+    Returns count of transaction summary based on transaction type
+    """
     try:
         type_summary = db.query(models.Customers.txn_type, func.count(models.Customers.txn_type).label("Count")).group_by(models.Customers.txn_type).all()
         return {"Amount Summary on transaction type": type_summary}
@@ -107,6 +135,9 @@ def get_trans_summary(db: Session = Depends(get_db)):
 
 @app.get("/transaction_amount_summary/")
 def get_trans_amount_summary(db: Session = Depends(get_db)):
+    """
+    Returns sum of transaction amount based on transaction type
+    """
     try:
         type_summary = db.query(models.Customers.txn_type, func.sum(models.Customers.AMOUNT).label("AMOUNT")).group_by(models.Customers.txn_type).all()
         return {"Amount Summary on transaction type": type_summary}
@@ -118,6 +149,9 @@ def get_trans_amount_summary(db: Session = Depends(get_db)):
 
 @app.get("/total_transaction_amount/")
 def get_total_trans_amount(db: Session = Depends(get_db)):
+    """
+    Returns total transaction amount present in the table
+    """
     try:
         type_summary = db.query(func.sum(models.Customers.AMOUNT).label("Total Amount")).all()
         return {"Amount Summary on transaction type": type_summary}
