@@ -29,7 +29,7 @@ def index():
 @app.post("/upload_file/")
 def upload_file(csv_file: UploadFile = File(...), db: Session = Depends(get_db)):
     """
-    Takes a csv_file and Uploads it into customers table after processing
+    Takes a csv_file and Uploads it into customers table after processing.
     Params:
     csv_file: CSV File
     db: Database Session object
